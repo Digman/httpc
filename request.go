@@ -158,7 +158,11 @@ func (this *Request) log(t string) {
 		fmt.Printf("-------------------------------------------------------------------\n")
 		fmt.Printf("Request: %s %s\nHeader: %v\nCookies: %v\n", this.method, this.url, this.request.Header, this.request.Cookies())
 		if t == "url" {
-			fmt.Printf("Body: %v\n", this.data)
+			if this.method == "GET" {
+				fmt.Printf("Query: %v\n", this.request.URL.RawQuery)
+			} else {
+				fmt.Printf("Body: %v\n", this.data)
+			}
 		} else if t == "json" {
 			fmt.Printf("Body: %v\n", this.jsonData)
 		} else {
