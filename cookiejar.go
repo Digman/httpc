@@ -1,11 +1,13 @@
 package httpc
 
 import (
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 	"sync"
@@ -14,7 +16,6 @@ import (
 )
 
 type CookieJar struct {
-
 	mu sync.Mutex
 
 	entries map[string]map[string]entry
@@ -43,7 +44,7 @@ type entry struct {
 	Expires    time.Time
 	Creation   time.Time
 	LastAccess time.Time
-	seqNum uint64
+	seqNum     uint64
 }
 
 func (e *entry) id() string {
@@ -148,7 +149,7 @@ func (j *CookieJar) cookies(u *url.URL, now time.Time) (cookies []*http.Cookie) 
 	})
 	for _, e := range selected {
 		//修复了读取cookie时缺少Domain,造成读取后的cookie请求失效问题
-		cookies = append(cookies, &http.Cookie{Name: e.Name, Value: e.Value,Domain:e.Domain})
+		cookies = append(cookies, &http.Cookie{Name: e.Name, Value: e.Value, Domain: e.Domain})
 	}
 
 	return cookies
@@ -222,6 +223,30 @@ func (j *CookieJar) setCookies(u *url.URL, cookies []*http.Cookie, now time.Time
 	}
 }
 
+func (j *CookieJar) Persist(filename string) error {
+	fd, err := os.Create(filename)
+	if err == nil {
+		j.mu.Lock()
+		defer fd.Close()
+		defer j.mu.Unlock()
+		err = gob.NewEncoder(fd).Encode(j.entries)
+	}
+	return err
+}
+
+func (j *CookieJar) Load(filename string) error {
+	fd, err := os.Open(filename)
+	if err == nil {
+		j.mu.Lock()
+		defer j.mu.Unlock()
+		defer fd.Close()
+		err = gob.NewDecoder(fd).Decode(&j.entries)
+	} else if os.IsNotExist(err) {
+		err = nil
+	}
+	return err
+}
+
 func canonicalHost(host string) (string, error) {
 	var err error
 
@@ -256,7 +281,7 @@ func jarKey(host string) string {
 		return host
 	}
 
-	i :=strings.LastIndex(host, ".")
+	i := strings.LastIndex(host, ".")
 	if i <= 0 {
 		return host
 	}
