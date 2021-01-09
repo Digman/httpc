@@ -196,6 +196,13 @@ func (this *Request) End() (*http.Response, string, error) {
 
 }
 
+func (this *Request) EndResponse() (*http.Response, error) {
+	if this.err != nil {
+		return nil, errors.New(this.err.Error())
+	}
+	return this.response, nil
+}
+
 func (this *Request) EndByte() (*http.Response, []byte, error) {
 	if this.err != nil {
 		return nil, []byte(""), errors.New(this.err.Error())
