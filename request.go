@@ -71,6 +71,11 @@ func (this *Request) SetData(name, value string) *Request {
 	return this
 }
 
+func (this *Request) SetAllData(data url.Values) *Request {
+	this.data = data
+	return this
+}
+
 func (this *Request) SetJsonData(s string) *Request {
 	this.jsonData = s
 	return this
