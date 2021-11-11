@@ -109,7 +109,7 @@ func (this *Request) Send(a ...interface{}) *Request {
 			this.err = err
 			return this
 		}
-		this.request.Header.Set("Content-Type", "application/json")
+		this.request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	} else {
 		bodyBuf := &bytes.Buffer{}
 		bodyWriter := multipart.NewWriter(bodyBuf)
