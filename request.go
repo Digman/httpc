@@ -2,6 +2,7 @@ package httpc
 
 import (
 	"bytes"
+	"compress/flate"
 	"compress/gzip"
 	"errors"
 	"fmt"
@@ -185,8 +186,13 @@ func (this *Request) End() (*http.Response, string, error) {
 
 	var bodyByte []byte
 
-	if this.response.Header.Get("Content-Encoding") == "gzip" {
+	encoding := this.response.Header.Get("Content-Encoding")
+	if encoding == "gzip" {
 		reader, _ := gzip.NewReader(this.response.Body)
+		defer reader.Close()
+		bodyByte, _ = ioutil.ReadAll(reader)
+	} else if encoding == "deflate" {
+		reader := flate.NewReader(this.response.Body)
 		defer reader.Close()
 		bodyByte, _ = ioutil.ReadAll(reader)
 	} else {
