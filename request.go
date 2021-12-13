@@ -188,7 +188,10 @@ func (this *Request) End() (*http.Response, string, error) {
 
 	encoding := this.response.Header.Get("Content-Encoding")
 	if encoding == "gzip" {
-		reader, _ := gzip.NewReader(this.response.Body)
+		reader, err := gzip.NewReader(this.response.Body)
+		if err != nil {
+			return nil, "", err
+		}
 		defer reader.Close()
 		bodyByte, _ = ioutil.ReadAll(reader)
 	} else if encoding == "deflate" {
@@ -217,8 +220,16 @@ func (this *Request) EndByte() (*http.Response, []byte, error) {
 
 	var bodyByte []byte
 
-	if this.response.Header.Get("Content-Encoding") == "gzip" {
-		reader, _ := gzip.NewReader(this.response.Body)
+	encoding := this.response.Header.Get("Content-Encoding")
+	if encoding == "gzip" {
+		reader, err := gzip.NewReader(this.response.Body)
+		if err != nil {
+			return nil, []byte(""), err
+		}
+		defer reader.Close()
+		bodyByte, _ = ioutil.ReadAll(reader)
+	} else if encoding == "" {
+		reader := flate.NewReader(this.response.Body)
 		defer reader.Close()
 		bodyByte, _ = ioutil.ReadAll(reader)
 	} else {
