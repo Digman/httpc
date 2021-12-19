@@ -91,11 +91,12 @@ func (this *Request) Send(a ...interface{}) *Request {
 	var err error
 
 	if len(a) == 0 || a[0] == "url" {
-		if this.method == "GET" {
-			this.request, err = http.NewRequest(this.method, this.url, nil)
-		} else {
-			this.request, err = http.NewRequest(this.method, this.url, strings.NewReader(this.data.Encode()))
+		var body io.Reader
+		if this.method != "GET" {
+			body = strings.NewReader(this.data.Encode())
 		}
+		this.request, err = http.NewRequest(this.method, this.url, body)
+
 		defer this.log("url")
 		if err != nil {
 			this.err = err
