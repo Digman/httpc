@@ -31,7 +31,7 @@ func (this *HttpClient) SetSkipVerify(isSkipVerify bool) {
 	this.transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: isSkipVerify}
 }
 
-func (this *HttpClient) SetTransport(t *http.Transport) *HttpClient {
+func (this *HttpClient) SetTransport(t http.RoundTripper) *HttpClient {
 	this.client.Transport = t
 	return this
 }
