@@ -42,6 +42,26 @@ func NewRequest(client *HttpClient) *Request {
 	}
 }
 
+func (this *Request) Get(url string) *Request {
+	return this.SetUrl(url).SetMethod(http.MethodGet)
+}
+
+func (this *Request) Post(url string) *Request {
+	return this.SetUrl(url).SetMethod(http.MethodPost)
+}
+
+func (this *Request) Head(url string) *Request {
+	return this.SetUrl(url).SetMethod(http.MethodHead)
+}
+
+func (this *Request) Put(url string) *Request {
+	return this.SetUrl(url).SetMethod(http.MethodPut)
+}
+
+func (this *Request) Options(url string) *Request {
+	return this.SetUrl(url).SetMethod(http.MethodOptions)
+}
+
 func (this *Request) SetMethod(name string) *Request {
 	this.method = strings.ToUpper(name)
 	return this
