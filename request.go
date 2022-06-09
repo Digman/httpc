@@ -215,6 +215,10 @@ func (this *Request) End() (*http.Response, string, error) {
 		return nil, "", errors.New(this.err.Error())
 	}
 
+	defer func() {
+		_ = this.response.Body.Close()
+	}()
+
 	var bodyByte []byte
 
 	encoding := this.response.Header.Get("Content-Encoding")
@@ -241,6 +245,7 @@ func (this *Request) EndResponse() (*http.Response, error) {
 	if this.err != nil {
 		return nil, errors.New(this.err.Error())
 	}
+	_ = this.response.Body.Close()
 	return this.response, nil
 }
 
@@ -248,6 +253,10 @@ func (this *Request) EndByte() (*http.Response, []byte, error) {
 	if this.err != nil {
 		return nil, []byte(""), errors.New(this.err.Error())
 	}
+
+	defer func() {
+		_ = this.response.Body.Close()
+	}()
 
 	var bodyByte []byte
 
@@ -275,6 +284,10 @@ func (this *Request) EndFile(savePath, saveFileName string) (*http.Response, err
 	if this.err != nil {
 		return nil, errors.New(this.err.Error())
 	}
+
+	defer func() {
+		_ = this.response.Body.Close()
+	}()
 
 	if this.response.StatusCode != http.StatusOK {
 		return nil, errors.New("Not written")
