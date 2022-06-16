@@ -29,6 +29,8 @@ type Request struct {
 	fileData map[bool]map[string]string
 	debug    bool
 	err      error
+	username string
+	password string
 }
 
 func NewRequest(client *HttpClient) *Request {
@@ -60,6 +62,12 @@ func (this *Request) Put(url string) *Request {
 
 func (this *Request) Options(url string) *Request {
 	return this.SetUrl(url).SetMethod(http.MethodOptions)
+}
+
+func (this *Request) SetBasicAuth(userName, password string) *Request {
+	this.username = userName
+	this.password = password
+	return this
 }
 
 func (this *Request) SetMethod(name string) *Request {
@@ -127,6 +135,10 @@ func (this *Request) Send(a ...interface{}) *Request {
 		if err != nil {
 			this.err = err
 			return this
+		}
+
+		if this.username != "" && this.password != "" {
+			this.request.SetBasicAuth(this.username, this.password)
 		}
 
 		if this.method == "POST" {
