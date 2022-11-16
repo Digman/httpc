@@ -111,7 +111,11 @@ func (this *Request) SetJsonData(s string) *Request {
 }
 
 func (this *Request) SetFileData(name, value string, isFile bool) *Request {
-	this.fileData[isFile] = map[string]string{name: value}
+	if _, exists := this.fileData[isFile]; exists {
+		this.fileData[isFile][name] = value
+	} else {
+		this.fileData[isFile] = map[string]string{name: value}
+	}
 	return this
 }
 
