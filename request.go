@@ -121,7 +121,7 @@ func (this *Request) SetFileData(name, value string, isFile bool) *Request {
 
 func (this *Request) Send(a ...interface{}) *Request {
 	var err error
-
+	this.err = nil
 	if len(a) == 0 || a[0] == "url" {
 		var body io.Reader
 		if this.method != "GET" {
