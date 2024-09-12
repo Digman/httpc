@@ -14,6 +14,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	JSON "github.com/tidwall/gjson"
 )
 
 type Request struct {
@@ -245,6 +247,16 @@ func (this *Request) End() (*http.Response, string, error) {
 
 	return this.response, string(bodyByte), nil
 
+}
+
+func (r *Request) EndJson() (*http.Response, JSON.Result, error) {
+	response, body, err := r.End()
+
+	if err != nil {
+		return nil, JSON.Result{}, err
+	}
+
+	return response, JSON.Parse(body), nil
 }
 
 func (this *Request) EndResponse() (*http.Response, error) {
